@@ -178,6 +178,7 @@ void loop()
     SerialPort.println(report_l);
     distance_left = results_l.distance_mm;
   }
+  /* Dont delay between the two readings for any length of time. If this is 5ms its OK, if 5s then it is not*/
   delay(5);
 
   NewDataReady = 0;
@@ -201,6 +202,7 @@ do {
     SerialPort.println(report_r);
     distance_right = results_r.distance_mm;
   }
+  /* Again dont delay here unless its 5ms. Do the delay after all the work is done */
   delay(5);
   while (digitalRead(TOPSTOPA) == LOW || digitalRead(TOPSTOPB) == 0){
     speed_target = 0;
@@ -227,6 +229,24 @@ do {
   int error;
   //int danger = DANGER_DIST - distance;
   while (digitalRead(BOTLIMA) == HIGH && digitalRead(TOPLIMA) == HIGH && digitalRead(BOTLIMB) == HIGH && digitalRead(TOPLIMB) == HIGH){
+
+    /*
+    // How about (if doing both together)
+    int net_error = FOLLOW_DIST - avg_dist;
+    // Implied speed based on difference
+    // Negative error means we are above the target and generates a negative implied_velocity here - check convention with motor disabled!
+    int implied_velocity = net_error * max_speed / speed_band_size;
+    // Max speed limit must be obeyed
+    implied_velocity = min(implied_velocity, max_velocity);
+    implied_velocity = max(implied_velocity, -max_velocity);
+    // Dont go past stops
+    if( test_if_any_stop_switch_triggered_here ) {
+      implied_velocity = 0;
+    }
+    // Now set direction based on sign of implied_velocity and speed to abs(implied_velocity)
+    // and if you want, do each motor separately. However I would encourage any stop triggered means both motors go to zero speed
+    */
+
     if (error_left < 0 && error_right < 0){
       // case for up ?
       error = min(error_right, error_left);
